@@ -1,0 +1,6 @@
+# non-public contains any files we can't publish publicly, such as keys
+non-public/*
+!non-public/.keep
+
+# Environment variable files
+*.env
