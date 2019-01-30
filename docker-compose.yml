@@ -2,6 +2,7 @@ version: "3.7"  # Requires Docker 18.06.0+
 
 services:
   shibpostgres:
+    image: ${DOCKER_REGISTRY_ADDRESS}:5000/shibpostgres
     build:
       context: .
       dockerfile: shibpostgres.Dockerfile
@@ -11,6 +12,7 @@ services:
       - POSTGRES_DB=$SHIB_POSTGRES_DATABASE
 
   nginx-shib:
+    image: ${DOCKER_REGISTRY_ADDRESS}:5000/nginx-shib
     build:
       context: .
       dockerfile: nginx.Dockerfile
@@ -30,11 +32,15 @@ services:
         parallelism: 2
       restart_policy:
         condition: on-failure
+      placement:
+        # Constrain Nginx to run on the nodes ELB points to
+        constraints: [node.role == worker]
     ports:
       - "80:80"
       - "443:443"
 
   uclapi:
+    image: ${DOCKER_REGISTRY_ADDRESS}:5000/uclapi
     build:
       context: .
       dockerfile: uclapi.Dockerfile
