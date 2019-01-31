@@ -53,6 +53,11 @@ RUN if [ "$NGINX_BUILD" = "latest" ]; \
 
 COPY ./nginx/nginx-conf/* /usr/local/nginx/conf/
 
+RUN if [ ${ENVIRONMENT} = "prod" ]; \
+    then sed -i -e 's/SERVER_NAME_HERE/uclapi\.com/' /usr/local/nginx/conf/nginx.conf; \
+    else sed -i -e 's/SERVER_NAME_HERE/staging\.ninja/' /usr/local/nginx/conf/nginx.conf; \
+    fi
+
 # Set up the SWITCH respository to get Shibboleth SP 3
 RUN wget http://pkg.switch.ch/switchaai/SWITCHaai-swdistrib.asc && \
     VERIFY_CHECKSUM=`shasum -a 256 SWITCHaai-swdistrib.asc | head -n1 | awk '{print $1;}'` && \
