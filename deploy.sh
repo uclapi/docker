@@ -23,4 +23,4 @@ docker stack deploy -c docker-compose-tmp.yml --with-registry-auth uclapi
 # Delete the temporary Compose file ready for the next run
 rm docker-compose-tmp.yml
 
-echo "Hopefully, deployment was successful!
+echo "Hopefully, deployment was successful"
