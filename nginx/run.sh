@@ -7,6 +7,13 @@ while /bin/true; do
         service supervisor start
     fi
 
+    # Ensure Shibboleth is running
+    service shibd status
+    SHIBD_STATUS=$?
+    if [ $SHIBD_STATUS -ne 0 ]; then
+        service shibd start
+    fi
+
     # Now check each other service
     ps aux | grep shibauthorizer | grep -q -v grep
     SHIBAUTHORIZER_STATUS=$?
