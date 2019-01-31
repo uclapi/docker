@@ -4,3 +4,6 @@ non-public/*
 
 # Environment variable files
 *.env
+
+# Temporary Docker Compose file
+docker-compose.tmp.yml

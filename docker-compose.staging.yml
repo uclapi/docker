@@ -1,0 +1,18 @@
+# Staging overlay Docker Compose
+version: "3.7" 
+
+services:
+  shibpostgres:
+    image: registry.staging.ninja:5001/shibpostgres
+
+  nginx-shib:
+    image: registry.staging.ninja:5001/nginx-shib
+    build:
+      args:
+        ENVIRONMENT: staging
+
+  uclapi:
+    image: registry.staging.ninja:5001/uclapi
+    build:
+      args:
+        ENVIRONMENT: staging

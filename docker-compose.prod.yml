@@ -1,0 +1,18 @@
+# Prod overlay Docker Compose
+version: "3.7" 
+
+services:
+  shibpostgres:
+    image: registry.uclapi.com:5001/shibpostgres
+
+  nginx-shib:
+    image: registry.uclapi.com:5001/nginx-shib
+    build:
+      args:
+        ENVIRONMENT: prod
+
+  uclapi:
+    image: registry.uclapi.com:5001/uclapi
+    build:
+      args:
+        ENVIRONMENT: prod

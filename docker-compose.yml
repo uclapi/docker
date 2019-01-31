@@ -2,7 +2,7 @@ version: "3.7"  # Requires Docker 18.06.0+
 
 services:
   shibpostgres:
-    image: ${DOCKER_REGISTRY_ADDRESS}:5000/shibpostgres
+    image: localhost:5000/shibpostgres
     build:
       context: .
       dockerfile: shibpostgres.Dockerfile
@@ -12,7 +12,7 @@ services:
       - POSTGRES_DB=$SHIB_POSTGRES_DATABASE
 
   nginx-shib:
-    image: ${DOCKER_REGISTRY_ADDRESS}:5000/nginx-shib
+    image: localhost:5000/nginx-shib
     build:
       context: .
       dockerfile: nginx.Dockerfile
@@ -27,9 +27,9 @@ services:
     depends_on:
       - shibpostgres
     deploy:
-      replicas: 4
+      replicas: 2
       update_config:
-        parallelism: 2
+        parallelism: 1
       restart_policy:
         condition: on-failure
       placement:
@@ -40,7 +40,7 @@ services:
       - "443:443"
 
   uclapi:
-    image: ${DOCKER_REGISTRY_ADDRESS}:5000/uclapi
+    image: localhost:5000/uclapi
     build:
       context: .
       dockerfile: uclapi.Dockerfile
@@ -53,22 +53,8 @@ services:
     ports:
       - "9000:9000"
     deploy:
-      replicas: 4
+      replicas: 3
       update_config:
         parallelism: 2
       restart_policy:
         condition: on-failure
-
-# Celery is still shared with the main UCL API Gunicorn project
-# TODO: decouple the two (but for now it's ok if they're together)
-  # celery:
-  #   build:
-  #     context: .
-  #     dockerfile: celery.Dockerfile
-  #   networks:
-  #     - internal
-  #   deploy:
-  #     replicas: 2
-  #     update_config:
-  #       parallelism: 2
-  #     restart_policy: on-failure
