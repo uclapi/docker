@@ -1,18 +1,18 @@
-# Prod overlay Docker Compose
+# Staging overlay Docker Compose
 version: "3.7" 
 
 services:
   shibpostgres:
-    image: registry.uclapi.com:5001/shibpostgres
+    image: 236848092535.dkr.ecr.eu-west-2.amazonaws.com/uclapi-prod-shibpostgres:latest
 
   nginx-shib:
-    image: registry.uclapi.com:5001/nginx-shib
+    image: 236848092535.dkr.ecr.eu-west-2.amazonaws.com/uclapi-prod-nginx-shib:latest
     build:
       args:
         ENVIRONMENT: prod
 
   uclapi:
-    image: registry.uclapi.com:5001/uclapi
+    image: 236848092535.dkr.ecr.eu-west-2.amazonaws.com/uclapi-prod-uclapi:latest
     build:
       args:
         ENVIRONMENT: prod

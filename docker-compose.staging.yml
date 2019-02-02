@@ -3,16 +3,16 @@ version: "3.7"
 
 services:
   shibpostgres:
-    image: registry.staging.ninja:5001/shibpostgres
+    image: 236848092535.dkr.ecr.eu-west-2.amazonaws.com/uclapi-staging-shibpostgres:latest
 
   nginx-shib:
-    image: registry.staging.ninja:5001/nginx-shib
+    image: 236848092535.dkr.ecr.eu-west-2.amazonaws.com/uclapi-staging-nginx-shib:latest
     build:
       args:
         ENVIRONMENT: staging
 
   uclapi:
-    image: registry.staging.ninja:5001/uclapi
+    image: 236848092535.dkr.ecr.eu-west-2.amazonaws.com/uclapi-staging-uclapi:latest
     build:
       args:
         ENVIRONMENT: staging
