@@ -75,11 +75,26 @@ RUN wget -O instantclient.zip ${ORACLE_INSTANTCLIENT_BASIC_URL} && \
 RUN cat /web/uclfw.rules >> /etc/hosts && \
     rm /web/uclfw.rules
 
+# Install the Supervisor configuration files
+COPY ./uclapi/supervisor-conf/supervisord.conf      /etc/supervisor/supervisord.conf
+COPY ./uclapi/supervisor-conf/gunicorn-django.conf  /etc/supervisor/conf.d/
+COPY ./uclapi/supervisor-conf/celery-uclapi.conf    /etc/supervisor/conf.d/
+
+# Invalidate the build cache using the GitHub API if there has been a new commit.
+# Courtesy of https://stackoverflow.com/a/39278224
+ADD https://api.github.com/repos/uclapi/uclapi/git/refs/heads/${UCLAPI_BRANCH} version.json
+
+# Install the run script
+COPY ./uclapi/run.sh /web/run.sh
+RUN chmod +x /web/run.sh
+
 # Install the UCL API
 RUN git clone ${UCLAPI_GIT_ADDRESS} -b ${UCLAPI_BRANCH}
 
-WORKDIR uclapi
+WORKDIR /web/uclapi
 
+# If a revision other than the latest has been requested, check that revision out.
+# Otherwise, we'll stick to master.
 RUN if [ "${UCLAPI_REVISION_SHA1}" != "latest" ]; then git reset --hard ${UCLAPI_REVISION_SHA1}; fi
 
 RUN pip3 install -r backend/uclapi/requirements.txt && \
@@ -87,17 +102,13 @@ RUN pip3 install -r backend/uclapi/requirements.txt && \
 
 COPY non-public/${ENVIRONMENT}/uclapi/uclapi.env /web/uclapi/backend/uclapi/.env
 
-COPY ./uclapi/supervisor-conf/supervisord.conf      /etc/supervisor/supervisord.conf
-COPY ./uclapi/supervisor-conf/gunicorn-django.conf  /etc/supervisor/conf.d/
-COPY ./uclapi/supervisor-conf/celery-uclapi.conf    /etc/supervisor/conf.d/
-
+# Ensure Supervisor works. If we get an error here then we know something is wrong.
+# If Supervisor restarts successfully and all services start then we are okay.
 RUN service supervisor stop; \
     service supervisor start; \
     supervisorctl restart all
 
-COPY ./uclapi/run.sh /web/run.sh
-RUN chmod +x /web/run.sh
-
+# Gunicorn runs on Port 9000
 EXPOSE 9000
 
 CMD /web/run.sh
