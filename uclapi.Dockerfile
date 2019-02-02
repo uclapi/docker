@@ -71,10 +71,6 @@ RUN wget -O instantclient.zip ${ORACLE_INSTANTCLIENT_BASIC_URL} && \
     echo "${ORACLE_HOME}" > /etc/ld.so.conf.d/oracle.conf && \
     ldconfig
 
-# Put the UCL firewall rules into the hosts file
-RUN cat /web/uclfw.rules >> /etc/hosts && \
-    rm /web/uclfw.rules
-
 # Install the Supervisor configuration files
 COPY ./uclapi/supervisor-conf/supervisord.conf      /etc/supervisor/supervisord.conf
 COPY ./uclapi/supervisor-conf/gunicorn-django.conf  /etc/supervisor/conf.d/
@@ -111,4 +107,9 @@ RUN service supervisor stop; \
 # Gunicorn runs on Port 9000
 EXPOSE 9000
 
-CMD /web/run.sh
+# Put the UCL firewall rules into the hosts file then run the start script.
+# This is because any hosts file changes made during the build phase of the
+# container will not be kept, so they must be added at start time.
+# Courtesy of: https://stackoverflow.com/a/40721996
+
+CMD cat /web/uclfw.rules >> /etc/hosts && /web/run.sh
