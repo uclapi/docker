@@ -51,7 +51,7 @@ RUN apt-get update && \
     apt-get clean
 
 # Fix up the language / encoding environment variables to stop Pip complaining later
-RUN locale-gen en_GB.UTF-8
+RUN apt-get install locales && locale-gen en_GB.UTF-8
 ENV LANG en_GB.UTF-8
 ENV LANGUAGE en_GB:en
 ENV LC_ALL en_GB.UTF-8
