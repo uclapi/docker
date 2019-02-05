@@ -33,7 +33,8 @@ COPY non-public/${ENVIRONMENT}/uclapi/uclfw.rules /web/uclfw.rules
 
 RUN apt-get update && \
     apt-get install -y python3 \
-                       python3-pip \
+                       python3-wheel \
+                       python3-setuptools \
                        libaio1 \
                        wget \
                        git \
@@ -48,6 +49,16 @@ RUN apt-get update && \
                        supervisor \
                        liblz4-1 &&\
     apt-get clean
+
+# Fix up the language / encoding environment variables to stop Pip complaining later
+ENV LC_ALL C
+ENV LANG en_GB.UTF-8
+
+# Install the latest version of Pip from the repo
+# Using ADD means that when the installation script changes remotely the container will
+# rebuild from this stage. Otherwise, it should progress.
+ADD https://bootstrap.pypa.io/get-pip.py get-pip.py
+RUN python3 get-pip.py
 
 # Install Oracle. This does the following:
 # - Downloads and unzips the instant client
@@ -93,9 +104,8 @@ WORKDIR /web/uclapi
 # Otherwise, we'll stick to master.
 RUN if [ "${UCLAPI_REVISION_SHA1}" != "latest" ]; then git reset --hard ${UCLAPI_REVISION_SHA1}; fi
 
-ENV LC_ALL C
-
-RUN pip3 install --no-cache-dir -r backend/uclapi/requirements.txt
+# Install all the UCL API Requirements
+RUN pip install --no-cache-dir -r backend/uclapi/requirements.txt
 
 COPY non-public/${ENVIRONMENT}/uclapi/uclapi.env /web/uclapi/backend/uclapi/.env
 
