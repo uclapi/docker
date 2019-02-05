@@ -51,8 +51,10 @@ RUN apt-get update && \
     apt-get clean
 
 # Fix up the language / encoding environment variables to stop Pip complaining later
-ENV LC_ALL C
+RUN locale-gen en_GB.UTF-8
 ENV LANG en_GB.UTF-8
+ENV LANGUAGE en_GB:en
+ENV LC_ALL en_GB.UTF-8
 
 # Install the latest version of Pip from the repo
 # Using ADD means that when the installation script changes remotely the container will
