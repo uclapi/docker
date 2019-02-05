@@ -10,6 +10,15 @@ services:
       - POSTGRES_USER=$SHIB_POSTGRES_USERNAME
       - POSTGRES_PASSWORD=$SHIB_POSTGRES_PASSWORD
       - POSTGRES_DB=$SHIB_POSTGRES_DATABASE
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        # Constrain the Shibboleth Postgres instance to live on the non-public facing Manager
+        constraints: [node.role == manager]
 
   nginx-shib:
     image: localhost:5000/nginx-shib
@@ -26,15 +35,6 @@ services:
       ".env"
     depends_on:
       - shibpostgres
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        # Constrain Nginx to run on the nodes ELB points to
-        constraints: [node.role == worker]
     ports:
       - "80:80"
       - "443:443"
@@ -52,9 +52,4 @@ services:
       - nginx-shib
     ports:
       - "9000:9000"
-    deploy:
-      replicas: 3
-      update_config:
-        parallelism: 2
-      restart_policy:
-        condition: on-failure
+
