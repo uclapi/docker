@@ -93,8 +93,10 @@ WORKDIR /web/uclapi
 # Otherwise, we'll stick to master.
 RUN if [ "${UCLAPI_REVISION_SHA1}" != "latest" ]; then git reset --hard ${UCLAPI_REVISION_SHA1}; fi
 
-RUN pip3 install -r backend/uclapi/requirements.txt && \
-    pip3 install gunicorn
+ENV LC_ALL C
+
+RUN pip3 install -U pip && \
+    pip3 install --no-cache-dir -r backend/uclapi/requirements.txt
 
 COPY non-public/${ENVIRONMENT}/uclapi/uclapi.env /web/uclapi/backend/uclapi/.env
 
