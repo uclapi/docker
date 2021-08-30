@@ -35,7 +35,11 @@ RUN apt-get update && \
                        sed \
                        git \
                        gnupg && \
-    apt-get clean
+    apt-get clean && \
+    snap install core && \
+    snap refresh core && \
+    snap install --classic certbot && \
+    ln -s /snap/bin/certbot /usr/bin/certbot
 
 # Installing Nginx
 ENV NGINX_AWS_URL https://${AWS_BUCKET}.s3.amazonaws.com/nginx
